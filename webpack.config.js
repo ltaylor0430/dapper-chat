@@ -1,31 +1,19 @@
-var webpack = require('webpack'),
-    path = require('path');
+/**
+ * @author: @AngularClass
+ */
 
-function root(args) {
-  args = Array.prototype.slice.call(arguments, 0);
-  return path.join.apply(path, [__dirname].concat(args));
+// Look in ./config folder for webpack.dev.js
+console.log(process.env.NODE_ENV);
+switch (process.env.NODE_ENV) {
+  case 'prod':
+  case 'production':
+    module.exports = require('./config/webpack.prod');
+    break;
+  case 'electron':
+    module.exports = require('./config/webpack.electron');
+    break;
+  case 'dev':
+  case 'development':
+  default:
+    module.exports = require('./config/webpack.dev');
 }
-
-module.exports = {
-  devtool: 'source-map',
-  debug: true,
-  watch: false,
-  resolve: {
-    extensions: ['', '.ts', '.js', '.html']
-  },
-  output: {
-    filename: 'bundle.js'
-  },
-  module: {
-    preLoaders: [
-      { test: /\.js$/, loader: 'source-map-loader', exclude: [ root('node_modules/rxjs') ] }
-    ],
-    loaders: [
-      { test: /\.ts$/, loader: 'awesome-typescript-loader', exclude: [ /\.(spec|e2e)\.ts$/ ] },
-      { test: /\.(html|css)$/, loader: 'raw-loader' }
-    ]
-  },
-  devServer: {
-    historyApiFallback: true
-  }
-};

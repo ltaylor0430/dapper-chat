@@ -8,16 +8,18 @@ var path    = require('path');
 var yargs   = require('yargs').argv;
 var tpl     = require('gulp-template');
 var rename  = require('gulp-rename');
+var flatten = require('gulp-flatten');
+
 
 /*
 map of paths for using with the tasks below
  */
 var paths = {
-  entry: 'client/app/boot.ts',
+  entry : ['client/app/boot.ts','client/app/electron/main.ts'],
   app: ['client/app/**/*.{js,styl,html}', 'client/styles/**/*.styl'],
   js: 'client/app/**/*!(.spec.js).js',
   styl: ['client/app/**/*.styl', 'client/style/**/*.styl'],
-  toCopy: ['client/index.html'],
+  toCopy: ['client/index.html','client/index-electron.html','client/app/electron/main.js'],
   html: ['client/index.html', 'client/app/**/*.html'],
   dest: 'dist',
   blankTemplates: 'templates/component/*.**'
@@ -51,6 +53,7 @@ gulp.task('dev', ['todo'],function() {
   }))
   .pipe(gulp.dest(paths.dest));
 });
+
 gulp.task('serve', function() {
   browser({
     port: process.env.PORT || 4500,
@@ -67,6 +70,7 @@ simple task to copy over needed files to dist
  */
 gulp.task('copy', function() {
   return gulp.src(paths.toCopy, { base: 'client' })
+    .pipe(flatten())
     .pipe(gulp.dest(paths.dest));
 });
 
@@ -97,8 +101,17 @@ gulp.task('component', function(){
     }))
     .pipe(gulp.dest(destPath));
 });
+gulp.task('set-dev-node-env', function() {
+    return process.env.NODE_ENV = 'development';
+});
 
+gulp.task('set-prod-node-env', function() {
+    return process.env.NODE_ENV = 'production';
+});
+gulp.task('electron', function(done){
+  sync('build','copy',done)
+});
 
 gulp.task('default', function(done) {
-  sync('build', 'copy', 'serve', 'watch', done)
+  sync('set-dev-node-env','build', 'copy', 'serve', 'watch', done)
 });
