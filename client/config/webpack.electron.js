@@ -16,6 +16,7 @@ module.exports = {
   resolve: {
     extensions: ['', '.ts', '.js', '.html']
   },
+  target: 'electron',
   output: {
     filename: '[name].js'
   },
